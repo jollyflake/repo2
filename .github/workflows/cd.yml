@@ -1,0 +1,42 @@
+name: CD
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    needs: build # Ensure the CI build job completes successfully
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Docker Compose files (if applicable)
+        # If your deployment uses Docker Compose, you might have configuration files
+        # in your repository or a separate configuration repository.
+        # Example:
+        # uses: actions/checkout@v4
+        # with:
+        #   repository: your-org/deployment-configs
+        #   path: deployment
+
+      - name: Deploy to Environment (Example - Replace with your actual deployment steps)
+        env:
+          DOCKER_IMAGE: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          DEPLOYMENT_HOST: ${{ secrets.DEPLOYMENT_HOST }}
+          DEPLOYMENT_USER: ${{ secrets.DEPLOYMENT_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          echo "Deploying image $DOCKER_IMAGE to $DEPLOYMENT_HOST"
+          # Example using SSH to a server:
+          # ssh -o StrictHostKeyChecking=no -i "$SSH_PRIVATE_KEY" "$DEPLOYMENT_USER@$DEPLOYMENT_HOST" << EOF
+          #   docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+          #   docker pull $DOCKER_IMAGE
+          #   docker stop my-app || true
+          #   docker rm my-app || true
+          #   docker run -d --name my-app -p 8080:8080 $DOCKER_IMAGE
+          #   echo "Deployment successful!"
+          # EOF
+          echo "Replace these steps with your actual deployment logic"
